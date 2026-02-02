@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Tabla Periódica</title>
+<style>
+body{
+    font-family:Arial;
+    background:linear-gradient(135deg,#4facfe,#00f2fe);
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+.container{
+    max-width:600px;
+    margin:auto;
+    background:rgba(0,0,0,0.4);
+    padding:20px;
+    border-radius:20px;
+}
+button{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+button:hover{
+    background:#ddd;
+    color:black;
+}
+img{
+    width:200px;
+    border-radius:10px;
+    margin-top:10px;
+    display:none;
+}
+.timer{
+    font-size:20px;
+}
+.credito{
+    margin-top:10px;
+    font-size:14px;
+    opacity:0.85;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>⚗️ Quiz Tabla Periódica</h1>
+<p class="credito"><b>Hecho por Luis Matias Sedeño Gil</b></p>
+
+<div id="menu">
+    <button onclick="startGame()">Iniciar Juego</button>
+</div>
+
+<div id="quiz" style="display:none;">
+    <div class="timer">⏳ Tiempo: <span id="time">10</span></div>
+    <h2 id="question"></h2>
+    <img id="image">
+    <div id="answers"></div>
+</div>
+
+<div id="result"></div>
+</div>
+
+<script>
+// BANCO DE 50 ELEMENTOS
+const elementos = [
+{nombre:"Hidrógeno",simbolo:"H",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Hydrogen_atom.svg/512px-Hydrogen_atom.svg.png"},
+{nombre:"Helio",simbolo:"He",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Helium_discharge_tube.jpg/512px-Helium_discharge_tube.jpg"},
+{nombre:"Litio",simbolo:"Li",img:"https://upload.wikimedia.org/wikipedia/commons/2/28/Lithium.jpg"},
+{nombre:"Berilio",simbolo:"Be",img:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Beryllium_crystals.jpg"},
+{nombre:"Boro",simbolo:"B",img:"https://upload.wikimedia.org/wikipedia/commons/f/f6/Boron-crystals.jpg"},
+{nombre:"Carbono",simbolo:"C",img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Diamond.jpg"},
+{nombre:"Nitrógeno",simbolo:"N",img:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Nitrogen_gas.jpg"},
+{nombre:"Oxígeno",simbolo:"O",img:"https://upload.wikimedia.org/wikipedia/commons/e/e4/Liquid_oxygen_in_a_beaker.jpg"},
+{nombre:"Flúor",simbolo:"F",img:"https://upload.wikimedia.org/wikipedia/commons/2/22/Fluorine-tube.jpg"},
+{nombre:"Neón",simbolo:"Ne",img:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Neon_discharge_tube.jpg"},
+{nombre:"Sodio",simbolo:"Na",img:"https://upload.wikimedia.org/wikipedia/commons/0/03/Sodium.jpg"},
+{nombre:"Magnesio",simbolo:"Mg",img:"https://upload.wikimedia.org/wikipedia/commons/4/45/Magnesium_powder.jpg"},
+{nombre:"Aluminio",simbolo:"Al",img:"https://upload.wikimedia.org/wikipedia/commons/7/7f/Aluminium_crystals.jpg"},
+{nombre:"Silicio",simbolo:"Si",img:"https://upload.wikimedia.org/wikipedia/commons/3/38/Silicon_crystal.jpg"},
+{nombre:"Fósforo",simbolo:"P",img:"https://upload.wikimedia.org/wikipedia/commons/b/bf/Phosphorus.jpg"},
+{nombre:"Azufre",simbolo:"S",img:"https://upload.wikimedia.org/wikipedia/commons/4/43/Sulfur-Crystals.jpg"},
+{nombre:"Cloro",simbolo:"Cl",img:"https://upload.wikimedia.org/wikipedia/commons/2/21/Chlorine_gas.jpg"},
+{nombre:"Argón",simbolo:"Ar",img:"https://upload.wikimedia.org/wikipedia/commons/7/7d/Argon-discharge-tube.jpg"},
+{nombre:"Potasio",simbolo:"K",img:"https://upload.wikimedia.org/wikipedia/commons/2/2e/Potassium_crystals.jpg"},
+{nombre:"Calcio",simbolo:"Ca",img:"https://upload.wikimedia.org/wikipedia/commons/c/cd/Calcium.jpg"},
+{nombre:"Escandio",simbolo:"Sc",img:"https://upload.wikimedia.org/wikipedia/commons/e/e3/Scandium.jpg"},
+{nombre:"Titanio",simbolo:"Ti",img:"https://upload.wikimedia.org/wikipedia/commons/5/55/Titanium_crystals.jpg"},
+{nombre:"Vanadio",simbolo:"V",img:"https://upload.wikimedia.org/wikipedia/commons/d/dc/Vanadium_crystals.jpg"},
+{nombre:"Cromo",simbolo:"Cr",img:"https://upload.wikimedia.org/wikipedia/commons/3/36/Chromium.jpg"},
+{nombre:"Manganeso",simbolo:"Mn",img:"https://upload.wikimedia.org/wikipedia/commons/6/6d/Manganese.jpg"},
+{nombre:"Hierro",simbolo:"Fe",img:"https://upload.wikimedia.org/wikipedia/commons/1/19/Iron_electrolytic_and_1cm3_cube.jpg"},
+{nombre:"Cobalto",simbolo:"Co",img:"https://upload.wikimedia.org/wikipedia/commons/1/11/Cobalt-crystals.jpg"},
+{nombre:"Níquel",simbolo:"Ni",img:"https://upload.wikimedia.org/wikipedia/commons/e/e1/Nickel_crystals.jpg"},
+{nombre:"Cobre",simbolo:"Cu",img:"https://upload.wikimedia.org/wikipedia/commons/8/83/Copper_crystals.jpg"},
+{nombre:"Zinc",simbolo:"Zn",img:"https://upload.wikimedia.org/wikipedia/commons/6/64/Zinc_crystals.jpg"},
+{nombre:"Galio",simbolo:"Ga",img:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Gallium.jpg"},
+{nombre:"Germanio",simbolo:"Ge",img:"https://upload.wikimedia.org/wikipedia/commons/4/49/Germanium_crystals.jpg"},
+{nombre:"Arsénico",simbolo:"As",img:"https://upload.wikimedia.org/wikipedia/commons/8/86/Arsenic-crystals.jpg"},
+{nombre:"Selenio",simbolo:"Se",img:"https://upload.wikimedia.org/wikipedia/commons/6/63/Selenium_crystals.jpg"},
+{nombre:"Bromo",simbolo:"Br",img:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Bromine.jpg"},
+{nombre:"Kriptón",simbolo:"Kr",img:"https://upload.wikimedia.org/wikipedia/commons/4/44/Krypton-discharge-tube.jpg"},
+{nombre:"Rubidio",simbolo:"Rb",img:"https://upload.wikimedia.org/wikipedia/commons/6/68/Rubidium.jpg"},
+{nombre:"Estroncio",simbolo:"Sr",img:"https://upload.wikimedia.org/wikipedia/commons/3/33/Strontium_crystals.jpg"},
+{nombre:"Itrio",simbolo:"Y",img:"https://upload.wikimedia.org/wikipedia/commons/e/e3/Yttrium.jpg"},
+{nombre:"Zirconio",simbolo:"Zr",img:"https://upload.wikimedia.org/wikipedia/commons/b/bc/Zirconium_crystals.jpg"},
+{nombre:"Niobio",simbolo:"Nb",img:"https://upload.wikimedia.org/wikipedia/commons/8/8e/Niobium_crystals.jpg"},
+{nombre:"Molibdeno",simbolo:"Mo",img:"https://upload.wikimedia.org/wikipedia/commons/3/36/Molybdenum_crystals.jpg"},
+{nombre:"Tecnecio",simbolo:"Tc",img:"https://upload.wikimedia.org/wikipedia/commons/5/5e/Tc-99m.png"},
+{nombre:"Rutenio",simbolo:"Ru",img:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Ruthenium_crystals.jpg"},
+{nombre:"Rodio",simbolo:"Rh",img:"https://upload.wikimedia.org/wikipedia/commons/4/45/Rhodium_crystals.jpg"},
+{nombre:"Palladio",simbolo:"Pd",img:"https://upload.wikimedia.org/wikipedia/commons/1/19/Palladium_crystals.jpg"},
+{nombre:"Plata",simbolo:"Ag",img:"https://upload.wikimedia.org/wikipedia/commons/5/5d/Silver_crystal.jpg"},
+{nombre:"Cadmio",simbolo:"Cd",img:"https://upload.wikimedia.org/wikipedia/commons/4/48/Cadmium.jpg"},
+{nombre:"Indio",simbolo:"In",img:"https://upload.wikimedia.org/wikipedia/commons/f/f4/Indium.jpg"},
+{nombre:"Estaño",simbolo:"Sn",img:"https://upload.wikimedia.org/wikipedia/commons/5/51/Tin-crystals.jpg"},
+{nombre:"Antimonio",simbolo:"Sb",img:"https://upload.wikimedia.org/wikipedia/commons/8/8a/Antimony_crystals.jpg"},
+{nombre:"Telurio",simbolo:"Te",img:"https://upload.wikimedia.org/wikipedia/commons/1/19/Tellurium_crystals.jpg"},
+{nombre:"Yodo",simbolo:"I",img:"https://upload.wikimedia.org/wikipedia/commons/e/e4/Iodine.jpg"},
+{nombre:"Xenón",simbolo:"Xe",img:"https://upload.wikimedia.org/wikipedia/commons/f/f3/Xenon-discharge-tube.jpg"}
+];
+
+// FUNCIONES DEL JUEGO
+function shuffle(array){return array.sort(()=>Math.random()-0.5);}
+function generarPreguntasUnicas(cantidad){
+let banco=[];
+elementos.forEach(el=>{
+let incorrectos = elementos.filter(e=>e!==el);
+incorrectos = shuffle(incorrectos).slice(0,3);
+let opciones = shuffle([el.simbolo,incorrectos[0].simbolo,incorrectos[1].simbolo,incorrectos[2].simbolo]);
+banco.push({q:`¿Cuál es el símbolo del elemento ${el.nombre}?`,img:el.img,options:opciones,correct:opciones.indexOf(el.simbolo)});
+});
+banco = shuffle(banco);
+return banco.slice(0,cantidad);
+}
+
+let preguntas=[],current=0,score=0,timer,timeLeft=10;
+
+function startGame(){
+preguntas = generarPreguntasUnicas(10);
+current=0;score=0;
+document.getElementById("menu").style.display="none";
+document.getElementById("quiz").style.display="block";
+loadQuestion();
+}
+
+function loadQuestion(){
+if(current>=preguntas.length){endGame();return;}
+let q = preguntas[current];
+document.getElementById("question").innerText=q.q;
+const img=document.getElementById("image");
+img.style.display="none";img.src=q.img;
+const answersDiv=document.getElementById("answers");
+answersDiv.innerHTML="";
+q.options.forEach((opt,index)=>{
+const btn=document.createElement("button");btn.innerText=opt;btn.onclick=()=>checkAnswer(index,q);answersDiv.appendChild(btn);
+});
+startTimer();
+}
+
+function startTimer(){
+timeLeft=10;document.getElementById("time").innerText=timeLeft;
+timer=setInterval(()=>{
+timeLeft--;document.getElementById("time").innerText=timeLeft;
+if(timeLeft<=0){clearInterval(timer);showFail("⏰ Tiempo terminado!",preguntas[current]);}
+},1000);
+}
+
+function checkAnswer(index,q){
+clearInterval(timer);
+if(index===q.correct){alert("✅ Correcto!");score++;next();}
+else{showFail("❌ Incorrecto",q);}
+}
+
+function showFail(text,q){
+const img=document.getElementById("image");img.style.display="block";
+setTimeout(()=>{alert(text+"\nRespuesta correcta: "+q.options[q.correct]);next();},600);
+}
+
+function next(){current++;loadQuestion();}
+
+function endGame(){
+document.getElementById("quiz").style.display="none";
+document.getElementById("result").innerHTML=`
+<h2>Juego terminado</h2>
+<h3>Puntaje: ${score}/10</h3>
+<p class="credito"><b>Hecho por Luis Matias Sedeño Gil</b></p>
+<button onclick="location.reload()">Jugar otra vez</button>
+`;
+}
+</script>
+</body>
+</html>
